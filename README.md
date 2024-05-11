@@ -21,3 +21,20 @@
 
 10）如果你的英语词汇水平在OALD，或GRE考试要求之上，可以考虑去了解一下我的一个高阶项目：**english dictionary database**（ https://github.com/mahavivo/english-dictionary ）。
 
+## 单词本单机程序
+
+使用python3, 依赖tk，如果没有安装，Linux执行下面命令，windows自行搜索
+```bash
+sudo apt-get install python3-tk
+```
+安装成功后执行下面命令会弹出tk窗口示例
+```bash
+python3 -m tkinter
+```
+
+运行程序
+```bash
+python3 learn.py
+```
+效果如下：
+![learn app](./learn_app.png)
