@@ -19,6 +19,7 @@ class VocabularyApp:
         self.current_index = 0
         self.auto_running = False
         self.file_path = ""
+        self.play_order = ""
 
         # Create the GUI components
         self.word_label = tk.Label(master, text="", font=("微软雅黑", 16))
@@ -67,6 +68,7 @@ class VocabularyApp:
                 session = json.load(file)
                 self.current_index = session['index']
                 self.file_path = session['file_path']
+                self.play_order = session['play_order']
                 with open(session['file_path'], 'r', encoding='utf-8') as f:
                     self.vocabulary = [line.strip() for line in f.readlines()]
         except (FileNotFoundError, KeyError, json.JSONDecodeError):
@@ -169,6 +171,7 @@ class VocabularyApp:
             session = {
                 'index': self.current_index,
                 'file_path': self.file_path,
+                'play_order': self.play_order,
             }
             with open('session.json', 'w', encoding='utf-8') as file:
                 json.dump(session, file, ensure_ascii=False)
