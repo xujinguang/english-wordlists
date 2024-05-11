@@ -12,7 +12,7 @@ class VocabularyApp:
     def __init__(self, master):
         self.master = master
         self.master.title("Vocabulary Learning App")
-        self.master.geometry("500x200")  # Set window size
+        self.master.geometry("500x250")  # Set window size
 
         # Initialize vocabulary list and index
         self.vocabulary = []
@@ -20,9 +20,15 @@ class VocabularyApp:
         self.auto_running = False
         self.file_path = ""
         self.play_order = ""
+        # 初始化已学习单词计数器
+        self.learned_count = 0
+
+        # 创建显示已学习单词数量的标签
+        self.learned_label = tk.Label(master, text=f"已学习单词数: {self.learned_count}")
+        self.learned_label.pack(anchor='ne')  # 在窗口的右上角
 
         # Create the GUI components
-        self.word_label = tk.Label(master, text="", font=("微软雅黑", 16))
+        self.word_label = tk.Label(master, text="", font=("微软雅黑", 14), wraplength=450)
         self.word_label.pack()
 
         self.button_frame = tk.Frame(master)
@@ -69,8 +75,10 @@ class VocabularyApp:
                 self.current_index = session['index']
                 self.file_path = session['file_path']
                 self.play_order = session['play_order']
+                self.learned_count = session['learned_count']
                 with open(session['file_path'], 'r', encoding='utf-8') as f:
                     self.vocabulary = [line.strip() for line in f.readlines()]
+            self.learned_label.config(text=f"已学习单词数: {self.learned_count}")
         except (FileNotFoundError, KeyError, json.JSONDecodeError):
             # Either the session file does not exist, or it's invalid
             pass
@@ -93,12 +101,18 @@ class VocabularyApp:
         print(f"播放顺序设置为: {'顺序' if order == 'sequential' else '乱序'}")
 
     def next_word(self):
-        if self.vocabulary:
-            if self.play_order == "sequential":
-                self.current_index = (self.current_index + 1) % len(self.vocabulary)
-            else:  # 如果是乱序播放
-                self.current_index = random.randint(0, len(self.vocabulary) - 1)
-            self.update_word_label()
+        if not self.vocabulary:
+            return
+
+        if self.play_order == "sequential":
+            self.current_index = (self.current_index + 1) % len(self.vocabulary)
+        else:  # 如果是乱序播放
+            self.current_index = random.randint(0, len(self.vocabulary) - 1)
+
+        self.learned_count += 1
+        self.learned_label.config(text=f"已学习单词数: {self.learned_count}")
+
+        self.update_word_label()
 
     def toggle_auto_display(self):
         if self.auto_running:
@@ -161,7 +175,7 @@ class VocabularyApp:
                 word = match.group(1)
                 phonetic = match.group(2)
                 definition = match.group(3)
-                word_info = "\n" + word + "\n" + phonetic + "\n\n" + definition
+                word_info = word + "\n" + phonetic + "\n\n" + definition
 
             self.word_label.config(text=word_info)
 
@@ -172,6 +186,7 @@ class VocabularyApp:
                 'index': self.current_index,
                 'file_path': self.file_path,
                 'play_order': self.play_order,
+                'learned_count': self.learned_count,
             }
             with open('session.json', 'w', encoding='utf-8') as file:
                 json.dump(session, file, ensure_ascii=False)
