@@ -6,6 +6,7 @@ import json
 import re
 from datetime import datetime
 import os
+import random
 
 class VocabularyApp:
     def __init__(self, master):
@@ -47,6 +48,13 @@ class VocabularyApp:
         self.file_menu.add_command(label="打开单词本", command=self.load_file)
         self.file_menu.add_command(label="备份生词本", command=self.backup_new_word_file)
 
+        self.order_menu = tk.Menu(self.menu, tearoff=0)
+        self.menu.add_cascade(label="播放顺序", menu=self.order_menu)
+
+        self.order_menu.add_command(label="顺序", command=lambda: self.set_play_order("sequential"))
+        self.order_menu.add_command(label="乱序", command=lambda: self.set_play_order("random"))
+
+
         self.load_previous_session()
         self.update_word_label()
 
@@ -78,9 +86,16 @@ class VocabularyApp:
             self.current_index = (self.current_index - 1) % len(self.vocabulary)
             self.update_word_label()
 
+    def set_play_order(self, order):
+        self.play_order = order
+        print(f"播放顺序设置为: {'顺序' if order == 'sequential' else '乱序'}")
+
     def next_word(self):
         if self.vocabulary:
-            self.current_index = (self.current_index + 1) % len(self.vocabulary)
+            if self.play_order == "sequential":
+                self.current_index = (self.current_index + 1) % len(self.vocabulary)
+            else:  # 如果是乱序播放
+                self.current_index = random.randint(0, len(self.vocabulary) - 1)
             self.update_word_label()
 
     def toggle_auto_display(self):
